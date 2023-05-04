@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import argparse
 
 from common import create_run_path, splitfn, show_img_with_kpts, calibrate, find_hom
 
@@ -55,23 +56,24 @@ class App:
         camera_n = len(self.camera_kpts_select)
         pattern_n = len(self.pattern_kpts_select)
         print(f'相机取点: {camera_n}个, 模板图取点: {pattern_n}个')
-        if camera_n == pattern_n and camera_n > 3:
+        if camera_n == pattern_n and camera_n >= 5:
             return True
         else:
             return False
 
     def random_select_kpts(self):
         n = len(self.camera_kpts_select_raw)
-        if self.random_select >= n or self.random_select < 5:
-            print('不进入随机取点')
+        if self.random_select < 5:
+            print('随机取点数小于5, 不进入随机取点')
             self.random_select = -1
         else:
             camera_rand_kpts = []
             pattern_rand_kpts = []
-            rand_idx = np.random.randint(0, n, size=self.random_select)
-            for idx in rand_idx:
-                camera_rand_kpts.append(self.camera_kpts_select_raw[idx])
-                pattern_rand_kpts.append(self.pattern_kpts_select_raw[idx])
+            rand_idx = np.arange(len(self.camera_kpts_select_raw))
+            np.random.shuffle(rand_idx)
+            for i in rand_idx[:self.random_select]:
+                camera_rand_kpts.append(self.camera_kpts_select_raw[i])
+                pattern_rand_kpts.append(self.pattern_kpts_select_raw[i])
             self.camera_kpts_select = camera_rand_kpts
             self.pattern_kpts_select = pattern_rand_kpts
             self.camera_show = show_img_with_kpts(
@@ -185,15 +187,24 @@ class App:
                     print("相机与模板图取点数量不同或数量太少")
 
 
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--camera-img-path', type=str, default='data/nike/left_side_1.jpg', help='相机实拍图像路径')
+    parser.add_argument('--pattern-img-path', type=str, default='data/pattern/court.jpg', help='模板图路径')
+    parser.add_argument('--camera-kpts-path', type=str, default=None, help='相机图像预选关键点')
+    parser.add_argument('--pattern-kpts-path', type=str, default='data/pattern/court_kpts.npz', help='模板图像预选关键点')
+    parser.add_argument('--camera-select-kpts-path', type=str, default='data/nike/left_side_1_camera_select_kpts.npz',
+                        help='相机图像已选关键点')
+    parser.add_argument('--pattern-select-kpts-path', type=str, default='data/nike/left_side_1_pattern_select_kpts.npz',
+                        help='模板图像已选关键点')
+    parser.add_argument('--fisheye', action='store_true', default=False, help='是否为鱼眼相机')
+    parser.add_argument('--random-select', type=int, default=-1, help='随机取点数量')
+    opt = parser.parse_args()
+    print(opt)
+    return opt
+
+
 if __name__ == "__main__":
-    calibration = App(
-        camera_img_path='data/nike/left_side_1.jpg',
-        pattern_img_path='data/pattern/court.jpg',
-        camera_kpts_path=None,
-        pattern_kpts_path='data/pattern/court_kpts.npz',
-        camera_select_kpts_path='data/nike/left_side_1_camera_select_kpts.npz',
-        pattern_select_kpts_path='data/nike/left_side_1_pattern_select_kpts.npz',
-        fisheye=False,
-        random_select=30
-    )
+    opt = parse_opt()
+    calibration = App(**vars(opt))
     calibration.run()
