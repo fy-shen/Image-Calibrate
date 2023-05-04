@@ -1,5 +1,7 @@
 # Image-Calibrate
 
+图像畸变矫正相关API解析请看[博客](https://blog.csdn.net/weixin_43605641/article/details/128109213)
+
 <details open>
 <summary>安装</summary>
 
@@ -14,7 +16,7 @@ git clone https://github.com/fy-shen/Image-Calibrate.git
 
 </details>
 
-<details>
+<details open>
 <summary>手动标点矫正图像</summary>
 
 
