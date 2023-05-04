@@ -189,7 +189,7 @@ class App:
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--camera-img-path', type=str, default='data/nike/left_side_1.jpg', help='相机实拍图像路径')
+    parser.add_argument('--camera-img-path', type=str, default='data/nike/left_side_1.jpg', help='相机图像路径')
     parser.add_argument('--pattern-img-path', type=str, default='data/pattern/court.jpg', help='模板图路径')
     parser.add_argument('--camera-kpts-path', type=str, default=None, help='相机图像预选关键点')
     parser.add_argument('--pattern-kpts-path', type=str, default='data/pattern/court_kpts.npz', help='模板图像预选关键点')
